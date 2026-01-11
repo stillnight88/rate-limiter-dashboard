@@ -104,8 +104,9 @@ export const getLogs = async (
             );
         }
 
+        // Fetch logs from Redis (get more than limit to account for filtering) 
+        // If we fetch only `limit` logs and then filter, we might get fewer results than requested.
         const fetchLimit = type === "all" ? limit : MAX_LIMIT;
-
         const allLogs = await getJSONList<RequestLog>(
             REDIS_KEYS.LOGS.REQUESTS,
             0,
@@ -114,6 +115,7 @@ export const getLogs = async (
 
         const filteredLogs = filterLogsByType(allLogs, type);
 
+        // Apply limit after filtering 
         const limitedLogs = filteredLogs.slice(0, limit);
 
         const response: LogsResponse = {
