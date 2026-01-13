@@ -5,6 +5,15 @@ import type { UpdateConfigRequest, RateLimitConfig } from '@/types/config';
 import { AxiosError } from 'axios';
 import type { ApiError } from '@/types/api';
 
+/**
+ * Update rate limit configuration
+ * 
+ * Strategy: Pessimistic (wait for server confirmation)
+ * On success: Invalidate config cache + show toast
+ * On error: Show error toast with details
+ * 
+ * @returns TanStack Query mutation with update function
+ */
 export const useUpdateConfig = () => {
     const queryClient = useQueryClient();
 
