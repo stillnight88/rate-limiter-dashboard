@@ -24,6 +24,6 @@ export const useRequestTimeline = (
         queryFn: () => analyticsAPI.getRequestTimeline(duration),
         enabled,
         refetchInterval,
-        refetchIntervalInBackground: false,
+        refetchOnWindowFocus: false,
     });
 };

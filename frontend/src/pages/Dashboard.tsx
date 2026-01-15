@@ -1,26 +1,35 @@
 import { AxiosError } from 'axios';
 import type { ApiResponse } from '@/types/api';
-import { useAuth } from '@/contexts/AuthContext.jsx';
+import { useAuth } from '@/contexts/AuthContext';
 import { useOverviewStats } from '@/hooks/useOverviewStats';
+import { useConfig } from '@/hooks/useConfig';
 import { StatsGrid } from '@/components/stats/StatsGrid';
 import { StatsGridSkeleton } from '@/components/stats/StatsGridSkeleton';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { RefreshCw, LogOut, AlertCircle, BarChart3, Shield, Logs, Settings } from 'lucide-react';
+import {
+    Card,
+    CardContent,
+    CardHeader,
+    CardTitle,
+} from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
+import { RefreshCw, LogOut, AlertCircle, BarChart3, Shield, Settings, FileText } from 'lucide-react';
 import { toast } from 'sonner';
 import { Link } from 'react-router-dom';
 
 const Dashboard = () => {
     const { user, logout, isAdmin } = useAuth();
-    const { data, isLoading, error, refetch } = useOverviewStats();
+    const { data: statsData, isLoading: statsLoading, error: statsError, refetch: refetchStats } = useOverviewStats();
+    const { data: configData, isLoading: configLoading } = useConfig();
 
     const handleLogout = () => {
         logout();
     };
 
     const handleRetry = async () => {
-        toast.promise(refetch(), {
+        toast.promise(refetchStats(), {
             loading: 'Refreshing stats...',
             success: 'Stats updated successfully',
             error: 'Failed to refresh stats',
@@ -86,12 +95,12 @@ const Dashboard = () => {
                         </Link>
                         <Link to="/logs">
                             <Button variant="ghost" size="sm">
-                                <Logs className="mr-0.5 h-4 w-4" />
+                                <FileText className="mr-0.5 h-4 w-4" />
                                 Logs
                             </Button>
                         </Link>
 
-                        {!isLoading && !error && (
+                        {!statsLoading && !statsError && (
                             <Button
                                 variant="outline"
                                 size="icon"
@@ -111,17 +120,18 @@ const Dashboard = () => {
 
             <Separator />
 
-            <main className="container mx-auto px-6 py-8">
-                {isLoading && <StatsGridSkeleton />}
+            <main className="container mx-auto px-6 py-8 space-y-6">
+                {/* Stats Grid */}
+                {statsLoading && <StatsGridSkeleton />}
 
-                {error && !isLoading && (
+                {statsError && !statsLoading && (
                     <div className="flex flex-col items-center justify-center rounded-lg border border-destructive/50 bg-destructive/10 p-8 text-center">
                         <AlertCircle className="mb-4 h-12 w-12 text-destructive" />
                         <h2 className="mb-2 text-lg font-semibold">
                             Failed to Load Stats
                         </h2>
                         <p className="mb-4 text-muted-foreground text-sm">
-                            {getErrorMessage(error)}
+                            {getErrorMessage(statsError)}
                         </p>
                         <Button onClick={handleRetry} variant="outline">
                             <RefreshCw className="mr-2 h-4 w-4" />
@@ -130,25 +140,42 @@ const Dashboard = () => {
                     </div>
                 )}
 
-                {data && !isLoading && !error && <StatsGrid data={data.data} />}
+                {statsData && !statsLoading && !statsError && (
+                    <StatsGrid data={statsData.data} />
+                )}
 
-                {data && !isLoading && !error && (
-                    <div className="mt-8 rounded-lg border bg-card p-4">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <p className="font-medium text-sm">Rate Limit Status</p>
-                                <p className="text-muted-foreground text-xs">
-                                    Current configuration: {data.data.currentRateLimit.points}{' '}
-                                    requests per {data.data.currentRateLimit.duration} seconds
-                                </p>
+                {/* Rate Limit Status Card */}
+                {!statsLoading && !statsError && statsData && (
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Rate Limit Status</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="grid gap-6 sm:grid-cols-2">
+                                {/* Current Configuration */}
+                                <div className="space-y-2">
+                                    <p className="text-sm font-medium text-muted-foreground">
+                                        Current Configuration
+                                    </p>
+                                    {configLoading ? (
+                                        <Skeleton className="h-6 w-48" />
+                                    ) : configData ? (
+                                        <p className="text-lg font-semibold">
+                                            {configData.points} requests per {configData.duration}s
+                                        </p>
+                                    ) : (
+                                        <p className="text-lg font-semibold">
+                                            {statsData.data.currentRateLimit.points} requests per{' '}
+                                            {statsData.data.currentRateLimit.duration}s
+                                        </p>
+                                    )}
+                                </div>
+
+                                {/* Remaining Quota */}
+                          
                             </div>
-                            <div className="flex items-center gap-2">
-                                <Badge variant="outline">
-                                    {data.rateLimit.remaining} / {data.rateLimit.limit} remaining
-                                </Badge>
-                            </div>
-                        </div>
-                    </div>
+                        </CardContent>
+                    </Card>
                 )}
             </main>
         </div>

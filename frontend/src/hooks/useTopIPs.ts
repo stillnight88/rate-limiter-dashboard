@@ -25,7 +25,7 @@ export const useTopIPs = (
         queryFn: () => abuseAPI.getTopIPs(limit),
         enabled,
         refetchInterval,
-        refetchIntervalInBackground: false,
+        refetchOnWindowFocus: false,
         staleTime: 3000,
     });
 };
