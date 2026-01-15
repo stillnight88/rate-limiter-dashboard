@@ -1,6 +1,6 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { LogOut, Shield, Home } from 'lucide-react';
+import { LogOut, Shield, Home, Logs, Settings } from 'lucide-react';
 import { RequestTimelineChart } from '@/components/analytics/RequestTimelineChart';
 import { Separator } from '@/components/ui/separator';
 import { Link } from 'react-router-dom';
@@ -35,6 +35,18 @@ const Analytics = () => {
               <Button variant="ghost" size="sm">
                 <Shield className="mr-0.5 h-4 w-4" />
                 IP Management
+              </Button>
+            </Link>
+            <Link to="/config">
+              <Button variant="ghost" size="sm">
+                <Settings className="mr-0.5 h-4 w-4" />
+                Config
+              </Button>
+            </Link>
+            <Link to="/logs">
+              <Button variant="ghost" size="sm">
+                <Logs className="mr-0.5 h-4 w-4" />
+                Logs
               </Button>
             </Link>
 

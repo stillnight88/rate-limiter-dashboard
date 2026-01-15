@@ -1,7 +1,7 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { LogOut, Shield, Home , BarChart3 } from 'lucide-react';
+import { LogOut, Shield, Home, BarChart3, Logs, Settings } from 'lucide-react';
 import { TopIPsTable } from '@/components/abuse/TopIPsTable';
 import { Separator } from '@/components/ui/separator';
 import { Link } from 'react-router-dom';
@@ -36,7 +36,7 @@ const IPManagement = () => {
           <div className="flex items-center gap-3">
             <Link to="/dashboard">
               <Button variant="ghost" size="sm">
-                <Home  className="mr-0.5 h-4 w-4" />
+                <Home className="mr-0.5 h-4 w-4" />
                 Dashboard
               </Button>
             </Link>
@@ -44,6 +44,18 @@ const IPManagement = () => {
               <Button variant="ghost" size="sm">
                 <BarChart3 className="mr-0.5 h-4 w-4" />
                 Analytics
+              </Button>
+            </Link>
+            <Link to="/config">
+              <Button variant="ghost" size="sm">
+                <Settings className="mr-0.5 h-4 w-4" />
+                Config
+              </Button>
+            </Link>
+            <Link to="/logs">
+              <Button variant="ghost" size="sm">
+                <Logs className="mr-0.5 h-4 w-4" />
+                Logs
               </Button>
             </Link>
 
