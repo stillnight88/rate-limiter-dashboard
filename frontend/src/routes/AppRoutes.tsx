@@ -5,6 +5,8 @@ import Dashboard from '@/pages/Dashboard';
 import { ProtectedRoute } from './ProtectedRoute';
 import Analytics from '@/pages/Analytics';
 import IPManagement from '@/pages/IPManagement';
+import Config from '@/pages/Config';
+import Logs from '@/pages/Logs';
 
 export const AppRoutes = () => {
   return (
@@ -17,8 +19,10 @@ export const AppRoutes = () => {
 
       <Route element={<ProtectedRoute />}>
         <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/analytics" element={<Analytics/>} />
+        <Route path="/analytics" element={<Analytics />} />
         <Route path="/ips" element={<IPManagement />} />
+        <Route path="/config" element={<Config />} />
+        <Route path="/logs" element={<Logs />} />
       </Route>
     </Routes>
   );

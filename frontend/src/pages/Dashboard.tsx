@@ -7,7 +7,7 @@ import { StatsGridSkeleton } from '@/components/stats/StatsGridSkeleton';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { RefreshCw, LogOut, AlertCircle, BarChart3, Shield } from 'lucide-react';
+import { RefreshCw, LogOut, AlertCircle, BarChart3, Shield, Logs, Settings } from 'lucide-react';
 import { toast } from 'sonner';
 import { Link } from 'react-router-dom';
 
@@ -76,6 +76,18 @@ const Dashboard = () => {
                             <Button variant="ghost" size="sm">
                                 <Shield className="mr-0.5 h-4 w-4" />
                                 IP Management
+                            </Button>
+                        </Link>
+                        <Link to="/config">
+                            <Button variant="ghost" size="sm">
+                                <Settings className="mr-0.5 h-4 w-4" />
+                                Config
+                            </Button>
+                        </Link>
+                        <Link to="/logs">
+                            <Button variant="ghost" size="sm">
+                                <Logs className="mr-0.5 h-4 w-4" />
+                                Logs
                             </Button>
                         </Link>
 

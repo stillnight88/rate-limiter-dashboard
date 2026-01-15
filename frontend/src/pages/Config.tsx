@@ -1,13 +1,18 @@
 import { useAuth } from '@/contexts/AuthContext';
+import { useConfig } from '@/hooks/useConfig';
+import { useUpdateConfig } from '@/hooks/useUpdateConfig';
+import { ConfigForm } from '@/components/config/ConfigForm';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { LogOut, Shield, Home, BarChart3, Logs, Settings } from 'lucide-react';
-import { TopIPsTable } from '@/components/abuse/TopIPsTable';
 import { Separator } from '@/components/ui/separator';
+import { LogOut, Home, BarChart3, Shield, Settings, AlertCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { DEFAULT_RATE_LIMIT } from '@/types/config';
 
-const IPManagement = () => {
+const Config = () => {
   const { user, logout, isAdmin } = useAuth();
+  const { data: config, isLoading, error } = useConfig();
+  const updateMutation = useUpdateConfig();
 
   const handleLogout = () => {
     logout();
@@ -15,17 +20,17 @@ const IPManagement = () => {
 
   return (
     <div className="min-h-screen bg-muted/40">
-
+      {/* Header */}
       <header className="border-b bg-background">
         <div className="container mx-auto flex items-center justify-between px-6 py-4">
           <div className="flex items-center gap-4">
             <div>
               <h1 className="text-2xl font-bold flex items-center gap-2">
-                <Shield className="h-6 w-6" />
-                IP Management
+                <Settings className="h-6 w-6" />
+                Configuration
               </h1>
               <p className="text-muted-foreground text-sm">
-                Monitor and manage IP addresses
+                Manage rate limit settings
               </p>
             </div>
             <Badge variant={isAdmin() ? 'default' : 'secondary'} className="capitalize">
@@ -46,16 +51,10 @@ const IPManagement = () => {
                 Analytics
               </Button>
             </Link>
-            <Link to="/config">
+            <Link to="/ips">
               <Button variant="ghost" size="sm">
-                <Settings className="mr-0.5 h-4 w-4" />
-                Config
-              </Button>
-            </Link>
-            <Link to="/logs">
-              <Button variant="ghost" size="sm">
-                <Logs className="mr-0.5 h-4 w-4" />
-                Logs
+                <Shield className="mr-0.5 h-4 w-4" />
+                IP Management
               </Button>
             </Link>
 
@@ -70,20 +69,46 @@ const IPManagement = () => {
 
       <Separator />
 
+      {/* Main Content */}
       <main className="container mx-auto px-6 py-8">
+        {/* Viewer Warning */}
         {!isAdmin() && (
           <div className="mb-6 rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-950">
             <p className="text-sm text-blue-800 dark:text-blue-200">
-              <strong>Viewer Mode:</strong> You can view IP data but cannot perform ban/unban actions.
+              <strong>Viewer Mode:</strong> You can view configuration but cannot make changes.
               Contact an administrator for elevated permissions.
             </p>
           </div>
         )}
 
-        <TopIPsTable />
+        {/* Error State */}
+        {error && !isLoading && (
+          <div className="flex flex-col items-center justify-center rounded-lg border border-destructive/50 bg-destructive/10 p-8 text-center">
+            <AlertCircle className="mb-4 h-12 w-12 text-destructive" />
+            <h2 className="mb-2 text-lg font-semibold">Failed to Load Configuration</h2>
+            <p className="mb-4 text-muted-foreground text-sm">
+              {error.message || 'Something went wrong'}
+            </p>
+            <Button onClick={() => window.location.reload()} variant="outline">
+              Retry
+            </Button>
+          </div>
+        )}
+
+        {/* Config Form */}
+        {!error && (
+          <div className="max-w-2xl">
+            <ConfigForm
+              initialValues={config ?? DEFAULT_RATE_LIMIT}
+              onSubmit={(values) => updateMutation.mutate(values)}
+              isLoading={isLoading}
+              isSubmitting={updateMutation.isPending}
+            />
+          </div>
+        )}
       </main>
     </div>
   );
 };
 
-export default IPManagement;
+export default Config;
