@@ -21,6 +21,9 @@ export const useUpdateConfig = () => {
         mutationFn: configApi.update,
 
         onSuccess: (data) => {
+            queryClient.setQueryData(['config', 'rate-limit'], data);  // Immediately update cache with new data
+
+            // Also invalidate to ensure fresh fetch on next mount
             queryClient.invalidateQueries({ queryKey: ['config', 'rate-limit'] });
             toast.success('Configuration updated', {
                 description: `Rate limit set to ${data.points} requests per ${data.duration} seconds`,

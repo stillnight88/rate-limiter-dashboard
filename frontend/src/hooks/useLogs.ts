@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useSearchParams } from 'react-router-dom';
 import { useCallback, useMemo } from 'react';
 import { logsApi } from '@/api/config';
-import type { LogsResponse, LogsFilters, LogFilterType, LogLimit, LogType } from '@/types/logs';
+import type { LogsResponse, LogsFilters, LogFilterType, LogLimit } from '@/types/logs';
 import { DEFAULT_LOGS_FILTERS } from '@/types/logs';
 
 // Parse and validate filter from URL search params
@@ -71,12 +71,14 @@ export const useLogs = () => {
     );
 
     const setType = useCallback(
-        (type: LogType) => updateFilters({ type }),
+        (type: LogFilterType) => {
+            updateFilters({ type });
+        },
         [updateFilters]
     );
 
     const setLimit = useCallback(
-        (limit: LogLimit) => updateFilters({ limit }),
+        (limit: LogLimit) => { updateFilters({ limit }) },
         [updateFilters]
     );
 

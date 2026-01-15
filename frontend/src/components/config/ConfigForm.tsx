@@ -1,6 +1,7 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -59,6 +60,10 @@ export function ConfigForm({
         defaultValues: initialValues,
         mode: 'onChange'
     });
+
+    useEffect(() => {
+        form.reset(initialValues);
+    }, [initialValues, form]);
 
     const handleSubmit = (values: ConfigFormValues) => {
         onSubmit(values);
@@ -147,7 +152,7 @@ export function ConfigForm({
                                 type="submit"
                                 disabled={!isDirty || isSubmitting || !form.formState.isValid}
                             >
-                                {isSubmitting && <Loader/>}
+                                {isSubmitting && <Loader />}
                                 {isSubmitting ? 'Saving...' : 'Save Changes'}
                             </Button>
 
