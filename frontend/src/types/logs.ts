@@ -1,5 +1,9 @@
-import type { LucideIcon } from 'lucide-react';
-import { CheckCircle, ShieldAlert, ShieldBan } from 'lucide-react';
+import {
+    CheckCircle,
+    ShieldAlert,
+    ShieldBan,
+    type LucideIcon,
+} from "lucide-react";
 
 export type LogType = 'allowed' | 'blocked' | 'banned';
 
@@ -50,16 +54,11 @@ export const LOG_LIMIT_OPTIONS: Array<{ value: LogLimit; label: string }> = [
     { value: 1000, label: '1000' },
 ] as const;
 
-// log type to Lucide icon component
-export const getLogTypeIcon = (type: LogType): LucideIcon => {
-    switch (type) {
-        case "allowed":
-            return CheckCircle;
-        case "blocked":
-            return ShieldAlert;
-        case "banned":
-            return ShieldBan;
-    }
+// log type to Lucide icon 
+export const LOG_TYPE_ICONS: Record<LogType, LucideIcon> = {
+    allowed: CheckCircle,
+    blocked: ShieldAlert,
+    banned: ShieldBan,
 };
 
 // log type to Badge variant
