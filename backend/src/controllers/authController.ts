@@ -1,4 +1,4 @@
-import Admin, { IAdminDocument } from "../models/Admin.js";
+import Admin, { IAdminDocument, AdminRole } from "../models/Admin.js";
 import { Request, Response } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { sendSuccess, sendError } from "../utils/responseHelpers.js";
@@ -199,7 +199,7 @@ export const logout = async (
 
 export const getCurrentUser = async (req: Request, res: Response): Promise<Response> => {
   try {
-    const user = req.user;  
+    const user = req.user;
     if (!user) {
       return res.status(401).json({
         success: false,
@@ -217,5 +217,61 @@ export const getCurrentUser = async (req: Request, res: Response): Promise<Respo
       success: false,
       error: "Failed to retrieve user",
     });
+  }
+};
+
+// POST api/auth/signup
+export const signup = async (
+  req: Request<{}, {}, LoginRequestBody & { name: string }>,
+  res: Response
+): Promise<Response> => {
+  try {
+    const { name, email, password } = req.body;
+
+    if (!name?.trim() || !email?.trim() || !password) {
+      return sendError(
+        res,
+        400,
+        "Missing required fields",
+        ["name", "email", "password"]
+      );
+    }
+
+    const existingUser = await Admin.findOne({ email: email.toLowerCase() });
+    if (existingUser) {
+      return sendError(res, 409, "User with this email already exists");
+    }
+
+    const newUser = await Admin.create({
+      name: name.trim(),
+      email: email.toLowerCase().trim(),
+      password,
+      role: AdminRole.VIEWER, // Default role
+      isActive: true,
+    });
+
+    const userPayload = createUserPayload(newUser);
+    const { accessToken, refreshToken } = generateTokens(userPayload);
+
+    setRefreshTokenCookie(res, refreshToken);
+
+    return sendSuccess<AuthResponse>(res, 201, "Signup successful", {
+      accessToken,
+      user: createUserResponse(newUser),
+    });
+  } catch (error) {
+    console.error("Signup error:", error);
+
+    // Handle duplicate key error (race condition)
+    if ((error as any).code === 11000) {
+      return sendError(res, 409, "User with this email already exists");
+    }
+
+    // Handle validation errors
+    if ((error as any).name === "ValidationError") {
+      return sendError(res, 400, (error as any).message);
+    }
+
+    return sendError(res, 500, "An error occurred during signup");
   }
 };
