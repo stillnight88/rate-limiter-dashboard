@@ -3,7 +3,13 @@ import helmet from "helmet";
 import compression from "compression";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import { rateLimiter } from "./middleware/rateLimiter.js";
+import { firewall } from "./middleware/firewall.js";
 import authRoutes from "./routes/authRoutes.js";
+import statsRoutes from "./routes/statsRoutes.js";
+import abuseRoutes from "./routes/abuseRoutes.js";
+import configRoutes from "./routes/configRoutes.js";
+import logsRoutes from "./routes/logsRoutes.js";
 
 const app: Express = express();
 
@@ -47,6 +53,12 @@ app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 app.use(cookieParser());
 
-app.use("/api/auth", authRoutes);
+app.use(firewall);
+app.use("/api/stats", statsRoutes);
+app.use("/api/abuse", abuseRoutes);
 
+app.use(rateLimiter);
+app.use("/api/auth", authRoutes);
+app.use("/api/config", configRoutes);
+app.use("/api/logs", logsRoutes);
 export default app;
